@@ -262,11 +262,13 @@
             GRAVITY_SWITCH_SECONDS: 12,
             GAP_SIZE: 160,
             COLORS: {
-                ship: '#00f3ff',
-                obstacle: '#bc13fe',
-                shield: '#0aff0a',
+                ship: '#00f3ff', // neon-blue
+                obstacle: '#bc13fe', // neon-purple
+                shield: '#0aff0a', // neon-green
                 star: '#ffffff',
-                particle: '#ff003c'
+                particle: '#ff003c', // neon-red
+                slow: '#00f3ff',
+                double: '#ffea00' // neon-yellow
             }
         };
 
@@ -309,7 +311,6 @@
             }
 
             playJump() {
-                // Short chirp
                 if (!this.ctx) return;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
@@ -328,7 +329,6 @@
             }
 
             playPowerup() {
-                // Ascending chime
                 if (!this.ctx) return;
                 this.playTone(440, 'sine', 0.2, 0.1);
                 setTimeout(() => this.playTone(554, 'sine', 0.2, 0.1), 100);
@@ -336,7 +336,6 @@
             }
 
             playCrash() {
-                // Noise buffer or low saw
                 this.playTone(100, 'sawtooth', 0.5, 0.3);
                 this.playTone(50, 'square', 0.5, 0.3);
             }
@@ -366,7 +365,7 @@
             }
 
             draw(ctx) {
-                ctx.globalAlpha = this.life / this.maxLife;
+                ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -407,15 +406,14 @@
                 this.y = y;
                 this.radius = 15;
                 this.active = true;
-                this.passed = false;
 
                 const types = ['shield', 'slow', 'double'];
                 this.type = types[Math.floor(Math.random() * types.length)];
 
                 this.color = '#fff';
                 if (this.type === 'shield') this.color = CONFIG.COLORS.shield;
-                if (this.type === 'slow') this.color = varToHex('--neon-blue');
-                if (this.type === 'double') this.color = varToHex('--neon-yellow');
+                if (this.type === 'slow') this.color = CONFIG.COLORS.slow;
+                if (this.type === 'double') this.color = CONFIG.COLORS.double;
 
                 this.bobOffset = Math.random() * 100;
             }
@@ -562,7 +560,7 @@
             }
 
             checkCollision(player) {
-                const r = 30; // Hitbox radius
+                const r = 28; // Slightly forgiving hitbox
                 const hazards = [
                     { x: this.x, y: this.currentGapY - this.gapSize / 2 - 30 },
                     { x: this.x, y: this.currentGapY - this.gapSize / 2 - 120 },
@@ -660,6 +658,7 @@
                 this.audio = new SoundManager();
 
                 this.state = 'START';
+                this.paused = false;
                 this.resize();
 
                 this.bg = new Background(this.width, this.height);
@@ -684,9 +683,15 @@
 
                 this.handleInput = this.handleInput.bind(this);
                 window.addEventListener('keydown', (e) => {
-                    if (e.code === 'Space') this.handleInput();
+                    if (e.code === 'Space') {
+                        if (e.repeat) return;
+                        this.handleInput();
+                    }
+                    if (e.code === 'KeyP') this.togglePause();
                 });
                 window.addEventListener('touchstart', (e) => {
+                    // Mobile Fix: Don't preventDefault if targeting a button
+                    if (e.target.tagName === 'BUTTON') return;
                     e.preventDefault();
                     this.handleInput();
                 }, { passive: false });
@@ -717,8 +722,9 @@
             }
 
             startGame() {
-                this.audio.init(); // Init audio context on user gesture
+                this.audio.init();
                 this.state = 'PLAYING';
+                this.paused = false;
                 this.score = 0;
                 this.gameSpeed = CONFIG.SPEED_INITIAL;
                 this.gravityTimer = CONFIG.GRAVITY_SWITCH_SECONDS;
@@ -742,8 +748,14 @@
                 this.startGame();
             }
 
+            togglePause() {
+                if (this.state === 'PLAYING') {
+                    this.paused = !this.paused;
+                }
+            }
+
             handleInput() {
-                if (this.state === 'PLAYING' && this.player) {
+                if (this.state === 'PLAYING' && !this.paused && this.player) {
                     this.player.jump();
                     this.particles.spawn(this.player.x - 10, this.player.y, '#ffaa00', 5, 50, Math.PI);
                     this.audio.playJump();
@@ -791,15 +803,17 @@
             }
 
             update(dt) {
+                if (this.paused) return;
+
                 // Time Dilation (Slow Mo)
                 let timeScale = 1;
                 if (this.modifiers.slowMoTimer > 0) {
                     this.modifiers.slowMoTimer -= dt;
                     timeScale = 0.5;
                 }
-                const gameDt = dt * timeScale; // Affected physics/movement
+                const gameDt = dt * timeScale;
 
-                this.particles.update(dt); // Particles run at normal speed
+                this.particles.update(dt);
 
                 if (this.state !== 'PLAYING') return;
 
@@ -814,8 +828,7 @@
                 if (this.obstacles.length === 0 || (this.width - this.obstacles[this.obstacles.length - 1].x) > CONFIG.OBSTACLE_SPAWN_BG) {
                     this.obstacles.push(new Obstacle(this.width + 100, this.height));
 
-                    // Chance to spawn powerup
-                    if (Math.random() < 0.2) {
+                    if (Math.random() < 0.25) {
                         this.powerups.push(new PowerUp(this.width + 100 + CONFIG.OBSTACLE_SPAWN_BG / 2, this.height / 2));
                     }
                 }
@@ -827,11 +840,10 @@
 
                     if (obs.checkCollision(this.player)) {
                         if (this.player.shieldTime > 0) {
-                            // Shield break
                             this.player.shieldTime = 0;
                             this.particles.spawn(this.player.x, this.player.y, CONFIG.COLORS.shield, 20, 100);
-                            this.obstacles.splice(i, 1); // remove obstacle for fun
-                            this.audio.playCrash(); // softer crash
+                            this.obstacles.splice(i, 1);
+                            this.audio.playCrash();
                         } else {
                             this.gameOver();
                         }
@@ -862,9 +874,8 @@
                     const dy = this.player.y - p.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < this.player.radius + p.radius) {
-                        // Collect
                         this.audio.playPowerup();
-                        if (p.type === 'shield') this.player.shieldTime = 3;
+                        if (p.type === 'shield') this.player.shieldTime = 5;
                         if (p.type === 'slow') this.modifiers.slowMoTimer = 4;
                         if (p.type === 'double') this.modifiers.doublePointsTimer = 5;
 
@@ -877,7 +888,7 @@
 
                 if (this.player.y <= 0 || this.player.y >= this.height) {
                     if (this.player.shieldTime > 0) {
-                        this.player.velocity *= -0.5; // Bounce
+                        this.player.velocity *= -0.5;
                         this.player.y = this.player.y <= 0 ? 1 : this.height - 1;
                         this.player.shieldTime = 0;
                     } else {
@@ -902,22 +913,29 @@
 
                 this.bg.draw(this.ctx);
 
-                this.obstacles.forEach(obs => obs.draw(this.ctx, this.height));
+                this.obstacles.forEach(obs => obs.draw(this.ctx));
                 this.powerups.forEach(p => p.draw(this.ctx));
                 this.particles.draw(this.ctx);
 
                 if (this.state === 'PLAYING') {
                     if (this.player) this.player.draw(this.ctx);
                 } else if (this.state === 'GAMEOVER') {
-                    // Keep drawing last state
                     if (this.player) this.player.draw(this.ctx);
+                }
+
+                if (this.paused) {
+                    this.ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                    this.ctx.fillRect(0, 0, this.width, this.height);
+                    this.ctx.fillStyle = '#fff';
+                    this.ctx.font = '30px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText("PAUSADO", this.width / 2, this.height / 2);
                 }
             }
 
             loop(timestamp) {
                 let dt = (timestamp - this.lastTime) / 1000;
                 this.lastTime = timestamp;
-                // prevent huge dt spikes
                 if (dt > 0.1) dt = 0.1;
 
                 this.update(dt);
@@ -927,23 +945,8 @@
             }
         }
 
-        // Helper to get CSS vars
-        function varToHex(v) {
-            const temp = document.createElement('div');
-            temp.style.color = `var(${v})`;
-            temp.style.display = 'none';
-            document.body.appendChild(temp);
-            const style = window.getComputedStyle(temp);
-            const color = style.color;
-            document.body.removeChild(temp);
-            return color;
-        }
-
         window.onload = () => {
             const game = new Game();
         };
 
     </script>
-</body>
-
-</html>
