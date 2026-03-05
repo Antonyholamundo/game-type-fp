@@ -1,0 +1,164 @@
+:root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-green: #0aff0a;
+            --neon-red: #ff003c;
+            --neon-yellow: #ffea00;
+            --bg-dark: #050510;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #gameCanvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Screens --- */
+        #startScreen,
+        #gameOverScreen {
+            background: rgba(5, 5, 16, 0.85);
+            /* Fondo oscuro transparente general */
+            pointer-events: auto;
+            /* Se removió padding/border del wrapper full-screen */
+        }
+
+        #startScreen>div,
+        #gameOverScreen>div {
+            background: var(--bg-dark);
+            padding: 3rem;
+            border: 4px solid var(--neon-blue);
+            box-shadow: 12px 12px 0px var(--neon-blue);
+            /* Sombra sólida plana */
+            border-radius: 0px;
+            min-width: 300px;
+            max-width: 90%;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0 0 1rem 0;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 4px 4px 0px var(--neon-purple);
+            /* Sombra sólida, sin brillo */
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #ccc;
+        }
+
+        .btn {
+            background: var(--bg-dark);
+            color: var(--neon-blue);
+            border: 4px solid var(--neon-blue);
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.2s ease;
+            box-shadow: 6px 6px 0px var(--neon-blue);
+            font-weight: bold;
+            border-radius: 0;
+        }
+
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px var(--neon-blue);
+            background: var(--neon-blue);
+            color: var(--bg-dark);
+        }
+
+        /* --- HUD --- */
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: none;
+        }
+
+        #scoreDisplay {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 4px 4px 0px var(--neon-green);
+        }
+
+        #activePowerups {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .powerup-icon {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 0px;
+            border: 2px solid #000;
+            box-shadow: 3px 3px 0px #fff;
+            display: none;
+            /* Controlled by JS */
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            #scoreDisplay {
+                font-size: 1.8rem;
+            }
+
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1.2rem;
+            }
+        }
