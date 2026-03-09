@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
 :root {
   --neon-blue: #b4783f; /* Brown */
@@ -15,7 +15,7 @@ body {
   overflow: hidden;
   background-color: var(--bg-dark);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
-  font-family: "Fredoka", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Press Start 2P", monospace;
   color: #3e2723;
   touch-action: none;
   user-select: none;
@@ -51,34 +51,256 @@ body {
   display: none !important;
 }
 
-/* --- Screens --- */
-#startScreen,
-#gameOverScreen {
-  background: rgba(232, 216, 200, 0.85);
-  /* Fondo claro transparente general */
+/* --- New Start Menu (Book Style) --- */
+#startScreen {
+  background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20zM20 0h20v20H20V0z' fill='%23cbaa88' fill-opacity='0.4' fill-rule='evenodd'/%3E%3Cpath d='M0 0h40v2H0V0zm0 20h40v2H0v-2zM0 0v40h2V0H0zm20 0v40h2V0h-2z' fill='%238c6b4e' fill-opacity='0.3'/%3E%3C/svg%3E");
+  background-color: #d8b898;
   pointer-events: auto;
-  /* Se removió padding/border del wrapper full-screen */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#startScreen > div,
+.menu-book-cover {
+  position: relative;
+  width: 320px;
+  height: 500px;
+  max-width: 90vw;
+  max-height: 85vh;
+  cursor: pointer;
+  transform: scale(1);
+  transition: transform 0.1s;
+}
+
+.menu-book-cover:active {
+  transform: scale(0.98);
+}
+
+/* Back half of the book holding the pages */
+.menu-book-pages {
+  position: absolute;
+  top: -15px;
+  left: 10px;
+  width: 100%;
+  height: 100%;
+  background-color: #e0c896;
+  border: 4px solid #000;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.menu-book-pages::before {
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: -20px;
+  width: calc(100% + 10px);
+  height: 14px;
+  background-color: #2b1d14; /* Top spine of back cover */
+  border: 4px solid #000;
+  border-bottom: none;
+  transform: skewX(-45deg);
+  transform-origin: bottom left;
+}
+
+/* Front Cover */
+.menu-book-front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #2b1d14; /* Dark brown book cover */
+  border: 4px solid #fff;
+  border-radius: 4px;
+  outline: 4px solid #000;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 4px #000;
+  overflow: hidden;
+}
+
+/* Tan oval inset */
+.menu-oval {
+  position: relative;
+  width: 85%;
+  height: 85%;
+  background-color: #d1ab7a;
+  border-radius: 50%;
+  border: 4px solid #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 15%;
+  box-sizing: border-box;
+}
+
+/* Oval split lighting effect (lighter on left) */
+.menu-oval::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-top-left-radius: 500px;
+  border-bottom-left-radius: 500px;
+  pointer-events: none;
+}
+
+/* Title text */
+.game-title {
+  font-size: 2.2rem;
+  margin: 0;
+  color: #3b2210;
+  text-shadow:
+    -3px -3px 0 #000,
+    3px -3px 0 #000,
+    -3px 3px 0 #000,
+    3px 3px 0 #000,
+    3px 6px 0px rgba(0, 0, 0, 0.5); /* Drop shadow effect */
+  text-align: center;
+  line-height: 1.4;
+  letter-spacing: 2px;
+  z-index: 3;
+}
+
+.menu-bean {
+  width: 60px;
+  height: auto;
+  margin-top: 20px;
+  z-index: 3;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.4));
+}
+
+.tap-instruction {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 3;
+}
+
+.tap-arrow {
+  color: #fff;
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+  text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000;
+  animation: bounce 1s infinite alternate;
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+.tap-btns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tap-box {
+  background-color: #59351e;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border: 2px solid #000;
+  position: relative;
+}
+
+.tap-box:first-child::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 6px 0 6px 6px;
+  border-color: transparent transparent transparent #59351e;
+  z-index: 2;
+}
+.tap-box:first-child::before {
+  content: "";
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent #000;
+  z-index: 1;
+}
+
+.tap-box:last-child::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 6px 6px 6px 0;
+  border-color: transparent #59351e transparent transparent;
+  z-index: 2;
+}
+.tap-box:last-child::after {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent #000 transparent transparent;
+  z-index: 1;
+}
+
+.tap-icon {
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 2px 0 #000);
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 2px;
+}
+
+/* Old game over container (unchanged mostly for now) */
+#gameOverScreen {
+  background: rgba(232, 216, 200, 0.85);
+  pointer-events: auto;
+}
+
 #gameOverScreen > div {
   background: #faf3e8;
   padding: 3rem;
-  border: none;
-  box-shadow: 0 10px 30px rgba(92, 58, 33, 0.15);
-  /* Sombra sólida plana */
+  border: 4px solid #000;
+  box-shadow: 0 10px 0px rgba(92, 58, 33, 0.4);
   border-radius: 16px;
   min-width: 300px;
   max-width: 90%;
 }
 
 h1 {
-  font-size: 3rem;
+  font-size: 2.2rem;
   margin: 0 0 1rem 0;
   text-transform: uppercase;
   color: #5c3a21;
   text-shadow: none;
   font-weight: 600;
+  line-height: 1.4;
 }
 
 p {
@@ -92,6 +314,7 @@ p {
   color: #fff;
   border: none;
   padding: 1rem 2rem;
+  font-family: "Press Start 2P", monospace;
   font-size: 1.5rem;
   cursor: pointer;
   text-transform: uppercase;

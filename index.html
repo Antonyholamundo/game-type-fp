@@ -1,44 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Bouncy Coffee</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Stellar Drift</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
+  <body>
     <canvas id="gameCanvas"></canvas>
 
     <div id="startScreen" class="ui-layer">
-        <div>
-            <h1>Stellar Drift</h1>
-            <p>Esquiva. Sobrevive. Adáptate.</p>
-            <p style="font-size: 0.9rem; margin-top: -1rem; opacity: 0.8">ESPACIO o CLICK para impulsarte</p>
-            <button class="btn" id="startBtn">JUGAR</button>
+      <!-- The outer book/menu contour -->
+      <div class="menu-book-cover" id="startBtn">
+        <div class="menu-book-pages"></div>
+        <div class="menu-book-front">
+          <div class="menu-oval">
+            <h1 class="game-title">BOUNCY<br />COFFEE</h1>
+
+            <img src="img/player.png" alt="Coffee Bean" class="menu-bean" />
+
+            <div class="tap-instruction">
+              <div class="tap-arrow">↑</div>
+              <div class="tap-btns">
+                <span class="tap-box">TAP</span>
+                <img
+                  src="https://unpkg.com/pixelarticons@1.8.1/svg/mouse.svg"
+                  alt="Tap"
+                  class="tap-icon"
+                />
+                <span class="tap-box">TAP</span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <div id="gameOverScreen" class="ui-layer hidden">
-        <div>
-            <h1 style="color: var(--neon-red); text-shadow: 5px 5px 0px #ab0028;">GAME OVER</h1>
-            <p id="finalScore">Puntuación: 0</p>
-            <p id="highScoreDisplay">Mejor: 0</p>
-            <button class="btn" id="restartBtn">REINTENTAR</button>
-        </div>
+      <div>
+        <h1 style="color: var(--neon-red); text-shadow: 5px 5px 0px #ab0028">
+          GAME OVER
+        </h1>
+        <p id="finalScore">Puntuación: 0</p>
+        <p id="highScoreDisplay">Mejor: 0</p>
+        <button class="btn" id="restartBtn">REINTENTAR</button>
+      </div>
     </div>
 
     <div id="hud">
-        <div id="scoreDisplay">0</div>
-        <div id="activePowerups">
-            <div id="pu-shield" class="powerup-icon" style="background: var(--neon-green); color: #000;">NO DAMAGE</div>
-            <div id="pu-slow" class="powerup-icon" style="background: var(--neon-blue); color: #000;">SLOW MOTION</div>
-            <div id="pu-double" class="powerup-icon" style="background: var(--neon-yellow); color: #000;">2X POINTS
-            </div>
+      <div id="scoreDisplay">0</div>
+      <div id="activePowerups">
+        <div
+          id="pu-shield"
+          class="powerup-icon"
+          style="background: var(--neon-green); color: #000"
+        >
+          NO DAMAGE
         </div>
+        <div
+          id="pu-slow"
+          class="powerup-icon"
+          style="background: var(--neon-blue); color: #000"
+        >
+          SLOW MOTION
+        </div>
+        <div
+          id="pu-double"
+          class="powerup-icon"
+          style="background: var(--neon-yellow); color: #000"
+        >
+          2X POINTS
+        </div>
+      </div>
     </div>
 
     <script src="script.js"></script>
+  </body>
+</html>

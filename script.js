@@ -204,7 +204,7 @@ class PowerUp {
 
     // Icon
     ctx.fillStyle = "#000";
-    ctx.font = "bold 12px Arial";
+    ctx.font = "bold 12px 'Press Start 2P', monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     let label = "?";
@@ -259,6 +259,14 @@ class Background {
   }
 }
 
+// --- IMAGES ---
+const pillowImg1 = new Image();
+pillowImg1.src = "img/obs-1.png";
+const pillowImg2 = new Image();
+pillowImg2.src = "img/obs-2.png";
+const playerImg = new Image();
+playerImg.src = "img/player.png";
+
 class Obstacle {
   constructor(x, height) {
     this.x = x;
@@ -274,19 +282,9 @@ class Obstacle {
     this.rotation = 0;
     this.rotationSpeed = randomRange(-1.5, 1.5);
 
-    this.polyTop = this.createAsteroidShape(35);
-    this.polyBot = this.createAsteroidShape(35);
-  }
-
-  createAsteroidShape(radius) {
-    const points = [];
-    const res = 7;
-    for (let i = 0; i < res; i++) {
-      const angle = (i / res) * Math.PI * 2;
-      const r = radius * randomRange(0.7, 1.3);
-      points.push({ x: Math.cos(angle) * r, y: Math.sin(angle) * r });
-    }
-    return points;
+    // Choose images for this obstacle
+    this.imgTop = Math.random() > 0.5 ? pillowImg1 : pillowImg2;
+    this.imgBot = Math.random() > 0.5 ? pillowImg1 : pillowImg2;
   }
 
   update(dt, speed, timeTotal) {
@@ -299,38 +297,53 @@ class Obstacle {
   }
 
   draw(ctx) {
-    ctx.fillStyle = CONFIG.COLORS.obstacle;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = CONFIG.COLORS.obstacle;
-
-    this.drawAsteroid(ctx, this.x, this.currentGapY - this.gapSize / 2 - 30);
-    this.drawAsteroid(ctx, this.x, this.currentGapY - this.gapSize / 2 - 120);
-
-    this.drawAsteroid(ctx, this.x, this.currentGapY + this.gapSize / 2 + 30);
-    this.drawAsteroid(ctx, this.x, this.currentGapY + this.gapSize / 2 + 120);
-  }
-
-  drawAsteroid(ctx, x, y) {
     ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(this.rotation);
-    ctx.beginPath();
-    this.polyTop.forEach((p, i) => {
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    });
-    ctx.closePath();
-    ctx.fill();
+
+    const drawPillow = (img, x, y, rot) => {
+      if (!img.complete) return;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rot);
+      ctx.drawImage(img, -40, -40, 80, 80);
+      ctx.restore();
+    };
+
+    drawPillow(
+      this.imgTop,
+      this.x,
+      this.currentGapY - this.gapSize / 2 - 40,
+      this.rotation,
+    );
+    drawPillow(
+      this.imgTop,
+      this.x,
+      this.currentGapY - this.gapSize / 2 - 130,
+      this.rotation + 0.5,
+    );
+
+    drawPillow(
+      this.imgBot,
+      this.x,
+      this.currentGapY + this.gapSize / 2 + 40,
+      this.rotation,
+    );
+    drawPillow(
+      this.imgBot,
+      this.x,
+      this.currentGapY + this.gapSize / 2 + 130,
+      this.rotation - 0.5,
+    );
+
     ctx.restore();
   }
 
   checkCollision(player) {
-    const r = 28; // Slightly forgiving hitbox
+    const r = 35; // Hitbox radius for pillows
     const hazards = [
-      { x: this.x, y: this.currentGapY - this.gapSize / 2 - 30 },
-      { x: this.x, y: this.currentGapY - this.gapSize / 2 - 120 },
-      { x: this.x, y: this.currentGapY + this.gapSize / 2 + 30 },
-      { x: this.x, y: this.currentGapY + this.gapSize / 2 + 120 },
+      { x: this.x, y: this.currentGapY - this.gapSize / 2 - 40 },
+      { x: this.x, y: this.currentGapY - this.gapSize / 2 - 130 },
+      { x: this.x, y: this.currentGapY + this.gapSize / 2 + 40 },
+      { x: this.x, y: this.currentGapY + this.gapSize / 2 + 130 },
     ];
 
     for (let h of hazards) {
@@ -390,33 +403,13 @@ class Player {
 
     ctx.rotate(this.angle);
 
-    // --- GRANO DE CAFE (Flat Design) ---
+    // --- GRANO DE CAFE (Pixel Art) ---
+    if (playerImg.complete) {
+      // Ajustar dimensiones según convenga: ancho 40, alto 24, centradas
+      ctx.drawImage(playerImg, -20, -12, 40, 24);
+    }
 
-    // 1. Cuerpo del grano de café (marrón oscuro)
-    ctx.fillStyle = "#4a2f1d"; // Color de café tostado
-    ctx.shadowBlur = 0; // Removido el neón para flat design
-    ctx.beginPath();
-    // Dibujar un óvalo inclinado o curvado
-    ctx.ellipse(0, 0, 16, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 2. La línea central (S-curve) característica del grano
-    ctx.strokeStyle = "#2d180c"; // Sombra más oscura
-    ctx.lineWidth = 3;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(12, 0); // Empieza en la punta derecha
-    // Curva de Bezier para simular la "S" del grano
-    ctx.bezierCurveTo(4, -6, -4, 6, -12, 0);
-    ctx.stroke();
-
-    // 3. Pequeño reflejo o brillo (opcional para darle volumen)
-    ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-    ctx.beginPath();
-    ctx.ellipse(0, -6, 8, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 4. (Opcional) Chispas de calor/fuego miniatura atrás
+    // Chispas
     if (Math.random() > 0.6) {
       ctx.fillStyle = "#ffaa00";
       ctx.beginPath();
