@@ -468,15 +468,17 @@ class Game {
     window.addEventListener(
       "touchstart",
       (e) => {
-        // Mobile Fix: Don't preventDefault if targeting a button
-        if (e.target.tagName === "BUTTON") return;
+        // Mobile Fix: Don't preventDefault if interacting with UI elements
+        if (e.target.closest("#startBtn") || e.target.closest("#restartBtn"))
+          return;
         e.preventDefault();
         this.handleInput();
       },
       { passive: false },
     );
     window.addEventListener("mousedown", (e) => {
-      if (e.target.tagName !== "BUTTON") this.handleInput();
+      if (!e.target.closest("#startBtn") && !e.target.closest("#restartBtn"))
+        this.handleInput();
     });
 
     $("startBtn").addEventListener("click", () => this.startGame());

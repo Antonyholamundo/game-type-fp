@@ -389,6 +389,19 @@ p {
     font-size: 2rem;
   }
 
+  .game-title {
+    font-size: 1.8rem;
+  }
+
+  .menu-bean {
+    width: 50px;
+    margin-top: 10px;
+  }
+
+  .tap-instruction {
+    transform: scale(0.9);
+  }
+
   #scoreDisplay {
     font-size: 1.8rem;
   }
