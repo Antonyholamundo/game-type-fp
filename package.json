@@ -1,0 +1,23 @@
+{
+  "name": "game-type-fp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Antonyholamundo/game-type-fp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Antonyholamundo/game-type-fp/issues"
+  },
+  "homepage": "https://github.com/Antonyholamundo/game-type-fp#readme",
+  "dependencies": {
+    "jimp": "^1.6.0"
+  }
+}

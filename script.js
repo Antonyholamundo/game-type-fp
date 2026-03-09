@@ -189,29 +189,196 @@ class PowerUp {
     if (!this.active) return;
     ctx.save();
     ctx.translate(this.x, this.y);
-    ctx.fillStyle = this.color;
-    ctx.shadowBlur = 10;
+
+    // Aura/Neon glow behind the cup based on type
+    ctx.shadowBlur = 15;
     ctx.shadowColor = this.color;
+    ctx.fillStyle = this.color;
 
-    // Draw diamond shape
+    // Optional: Draw a subtle highlight circle behind the cup
+    ctx.globalAlpha = 0.3;
     ctx.beginPath();
-    ctx.moveTo(0, -this.radius);
-    ctx.lineTo(this.radius, 0);
-    ctx.lineTo(0, this.radius);
-    ctx.lineTo(-this.radius, 0);
-    ctx.closePath();
+    ctx.arc(0, 0, this.radius + 5, 0, Math.PI * 2);
     ctx.fill();
+    ctx.globalAlpha = 1.0;
 
-    // Icon
-    ctx.fillStyle = "#000";
-    ctx.font = "bold 12px 'Press Start 2P', monospace";
+    // Draw the coffee cup procedurally (pixel art approximation)
+    ctx.translate(0, -5); // Shift up slightly
+
+    // --- Exact Pixel Art Coffee Cup Matrix ---
+    // 0: transparent
+    // 1: black outline (#000)
+    // 2: dark brown coffee (#2d1b0e)
+    // 3: mid brown coffee (#3a2311)
+    // 4: light brown coffee/reflection (#4a2e17)
+    // 5: white body (#ffffff)
+    // 6: light gray shading (#e0e0e0)
+    // 7: mid gray shading (#cccccc)
+    // 8: light blue saucer/rim tint (#e0f7fa)
+    // 9: slightly darker blue saucer tint (#b2ebf2)
+    // A: dark gray shading (#999999)
+
+    const cupPixels = [
+      [
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 0, 0, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 0, 0, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 1, 1, 8, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 1, 1, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 1, 8, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 8, 1, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        0, 0, 1, 8, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 8, 1, 1,
+        0, 0, 0, 0,
+      ],
+      [
+        0, 0, 1, 2, 2, 2, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 8,
+        1, 0, 0, 0,
+      ],
+      [
+        0, 1, 8, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 8,
+        1, 0, 0, 0,
+      ],
+      [
+        0, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1,
+        0, 0, 0, 0,
+      ],
+      [
+        1, 8, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 1,
+        0, 0, 0, 0,
+      ],
+      [
+        1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1,
+        1, 1, 1, 0,
+      ],
+      [
+        1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 5, 5, 5, 1,
+        8, 8, 1, 1,
+      ],
+      [
+        1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 5, 5, 5, 1,
+        8, 5, 6, 1,
+      ],
+      [
+        1, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 5, 5, 6, 1,
+        8, 5, 6, 1,
+      ],
+      [
+        1, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 5, 5, 6, 1,
+        8, 6, 1, 0,
+      ],
+      [
+        0, 1, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 5, 6, 1, 8,
+        6, 1, 0, 0,
+      ],
+      [
+        0, 1, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 1, 8, 1,
+        1, 0, 0, 0,
+      ],
+      [
+        0, 0, 1, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 1, 1, 1, 1, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        0, 1, 8, 1, 1, 6, 6, 6, 6, 5, 5, 5, 5, 5, 6, 6, 6, 1, 1, 8, 1, 0, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        1, 8, 5, 5, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 5, 8, 8, 1, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        1, 5, 5, 6, 5, 5, 5, 8, 8, 8, 8, 8, 8, 8, 8, 5, 5, 5, 6, 5, 8, 1, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        1, 8, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 8, 1, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        1, 9, 8, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 8, 9, 1, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        0, 1, 9, 9, 8, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 8, 9, 9, 1, 0, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        0, 0, 1, 1, 9, 9, 9, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 1, 1, 0, 0, 0, 0,
+        0, 0, 0, 0,
+      ],
+      [
+        0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0,
+      ],
+    ];
+
+    const pixelSize = 2; // Size of each "pixel" square, adjust to scale
+    const startX = -((cupPixels[0].length * pixelSize) / 2); // Center horizontally
+    const startY = -((cupPixels.length * pixelSize) / 2) - 5; // Center vertically and shift up slightly
+
+    // Draw main cup
+    for (let r = 0; r < cupPixels.length; r++) {
+      for (let c = 0; c < cupPixels[r].length; c++) {
+        let val = cupPixels[r][c];
+        if (val === 0) continue;
+
+        if (val === 1)
+          ctx.fillStyle = "#000000"; // Outline
+        else if (val === 2)
+          ctx.fillStyle = "#2d1b0e"; // Dark coffee
+        else if (val === 3)
+          ctx.fillStyle = "#3a2311"; // Mid coffee
+        else if (val === 4)
+          ctx.fillStyle = "#4a2e17"; // Light coffee / reflection
+        else if (val === 5)
+          ctx.fillStyle = "#ffffff"; // White body / highlight
+        else if (val === 6)
+          ctx.fillStyle = "#e0e0e0"; // Light gray shading
+        else if (val === 7)
+          ctx.fillStyle = "#cccccc"; // Mid gray shading
+        else if (val === 8)
+          ctx.fillStyle = "#e0f7fa"; // Light blue rim/saucer
+        else if (val === 9)
+          ctx.fillStyle = "#b2ebf2"; // Dark blue saucer edge
+        else if (val === "A") ctx.fillStyle = "#999999"; // Dark gray edge
+
+        ctx.fillRect(
+          startX + c * pixelSize,
+          startY + r * pixelSize,
+          pixelSize,
+          pixelSize,
+        );
+      }
+    }
+
+    // Draw the identifying text on top
+    ctx.fillStyle = this.color; // Text matches powerup glow color
+    ctx.shadowBlur = 0; // No shadow for text to keep it crisp
+    ctx.font = "bold 14px 'Press Start 2P', monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+
+    // Slight stroke for readability
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 4;
+
     let label = "?";
     if (this.type === "shield") label = "S";
     if (this.type === "slow") label = "T";
     if (this.type === "double") label = "X2";
-    ctx.fillText(label, 0, 0);
+
+    // Draw stroke then fill over the cup
+    ctx.strokeText(label, 0, -2);
+    ctx.fillText(label, 0, -2);
 
     ctx.restore();
   }
@@ -443,6 +610,8 @@ class Game {
     this.obstacles = [];
     this.powerups = [];
 
+    this.currentLevel = 1;
+    this.obstaclesPassed = 0;
     this.score = 0;
     this.gameSpeed = CONFIG.SPEED_INITIAL;
     this.gravityTimer = 0;
@@ -469,7 +638,11 @@ class Game {
       "touchstart",
       (e) => {
         // Mobile Fix: Don't preventDefault if interacting with UI elements
-        if (e.target.closest("#startBtn") || e.target.closest("#restartBtn"))
+        if (
+          e.target.closest("#startBtn") ||
+          e.target.closest("#restartBtn") ||
+          e.target.closest("#nextLevelBtn")
+        )
           return;
         e.preventDefault();
         this.handleInput();
@@ -477,12 +650,20 @@ class Game {
       { passive: false },
     );
     window.addEventListener("mousedown", (e) => {
-      if (!e.target.closest("#startBtn") && !e.target.closest("#restartBtn"))
+      if (
+        !e.target.closest("#startBtn") &&
+        !e.target.closest("#restartBtn") &&
+        !e.target.closest("#nextLevelBtn")
+      )
         this.handleInput();
     });
 
-    $("startBtn").addEventListener("click", () => this.startGame());
+    $("startBtn").addEventListener("click", () => this.startGame(true));
     $("restartBtn").addEventListener("click", () => this.resetGame());
+    $("nextLevelBtn").addEventListener("click", () => {
+      this.currentLevel++;
+      this.startGame(false);
+    });
 
     if (!localStorage.getItem("stellarDriftHighScore")) {
       localStorage.setItem("stellarDriftHighScore", 0);
@@ -503,12 +684,16 @@ class Game {
     }
   }
 
-  startGame() {
+  startGame(isNewGame = true) {
+    if (isNewGame) {
+      this.currentLevel = 1;
+      this.score = 0;
+    }
     this.audio.init();
     this.state = "PLAYING";
     this.paused = false;
-    this.score = 0;
-    this.gameSpeed = CONFIG.SPEED_INITIAL;
+    this.obstaclesPassed = 0;
+    this.gameSpeed = CONFIG.SPEED_INITIAL + (this.currentLevel - 1) * 30;
     this.gravityTimer = CONFIG.GRAVITY_SWITCH_SECONDS;
     this.gravityDir = 1;
     this.obstacles = [];
@@ -521,12 +706,13 @@ class Game {
 
     $("startScreen").classList.add("hidden");
     $("gameOverScreen").classList.add("hidden");
+    $("levelCompleteScreen").classList.add("hidden");
     $("hud").style.display = "block";
     this.updateUI();
   }
 
   resetGame() {
-    this.startGame();
+    this.startGame(true);
   }
 
   togglePause() {
@@ -548,6 +734,16 @@ class Game {
       );
       this.audio.playJump();
     }
+  }
+
+  levelComplete() {
+    this.state = "LEVEL_COMPLETE";
+    this.audio.playPowerup();
+
+    $("levelCompleteScreen").classList.remove("hidden");
+    $("levelCompleteMessage").innerText =
+      `Has completado la Fase ${this.currentLevel}`;
+    $("hud").style.display = "none";
   }
 
   gameOver() {
@@ -653,6 +849,7 @@ class Game {
 
       if (!obs.passed && obs.x < this.player.x) {
         obs.passed = true;
+        this.obstaclesPassed++;
         let pts = 10;
         if (this.modifiers.doublePointsTimer > 0) pts *= 2;
         this.score += pts;
@@ -660,6 +857,15 @@ class Game {
         // Scale difficulty
         if (this.gameSpeed < CONFIG.MAX_SPEED) {
           this.gameSpeed += 5;
+        }
+
+        // Level conditions
+        if (this.currentLevel === 1 && this.obstaclesPassed >= 10) {
+          this.levelComplete();
+          return;
+        } else if (this.currentLevel === 2 && this.obstaclesPassed >= 20) {
+          this.levelComplete();
+          return;
         }
       }
 

@@ -278,12 +278,14 @@ body {
 }
 
 /* Old game over container (unchanged mostly for now) */
-#gameOverScreen {
+#gameOverScreen,
+#levelCompleteScreen {
   background: rgba(232, 216, 200, 0.85);
   pointer-events: auto;
 }
 
-#gameOverScreen > div {
+#gameOverScreen > div,
+#levelCompleteScreen > div {
   background: #faf3e8;
   padding: 3rem;
   border: 4px solid #000;
